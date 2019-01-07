@@ -22,10 +22,10 @@ class InvalidOauth2ClientException extends \Exception {
   public function __construct($invalidClientId, $message = "", $code = 0, \Throwable $previous = NULL) {
     if ($message == "") {
       if (is_scalar($invalidClientId)) {
-        $message = "The OAuth2 Client plugin ''" . $invalidClientId . "' does not exist";
+        $message = "The OAuth2 Client plugin '" . $invalidClientId . "' does not exist";
       }
       else {
-        $message = "An invalid value was passed for the OAuth2 Plugin ID";
+        $message = 'An invalid value was passed for the OAuth2 Plugin ID';
       }
     }
 

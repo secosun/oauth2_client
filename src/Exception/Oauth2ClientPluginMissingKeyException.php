@@ -20,7 +20,7 @@ class Oauth2ClientPluginMissingKeyException extends \Exception {
    *   The previous exception used for the exception chaining.
    */
   public function __construct($key, $message = "", $code = 0, \Throwable $previous = NULL) {
-    if ($message == "") {
+    if ($message == '') {
       $message = 'The Oauth2 Client plugin is missing required key: ' . $key;
     }
 
