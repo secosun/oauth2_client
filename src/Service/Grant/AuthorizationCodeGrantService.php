@@ -6,6 +6,7 @@ use Drupal\Core\Routing\UrlGeneratorInterface;
 use Drupal\Core\State\StateInterface;
 use Drupal\Core\TempStore\PrivateTempStoreFactory;
 use Drupal\oauth2_client\PluginManager\Oauth2ClientPluginManagerInterface;
+use League\OAuth2\Client\Provider\Exception\IdentityProviderException;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\RequestStack;
 
