@@ -25,7 +25,7 @@ abstract class Oauth2ClientGrantServiceBase extends Oauth2ClientServiceBase impl
   /**
    * The Drupal state.
    *
-   * @var Drupal\Core\State\StateInterface
+   * @var \Drupal\Core\State\StateInterface
    */
   protected $state;
 
@@ -75,6 +75,9 @@ abstract class Oauth2ClientGrantServiceBase extends Oauth2ClientServiceBase impl
    *
    * @return \League\OAuth2\Client\Provider\GenericProvider
    *   The provider of the OAuth2 Server.
+   *
+   * @throws \Drupal\oauth2_client\Exception\InvalidOauth2ClientException
+   *   Exception thrown when trying to retrieve a non-existent OAuth2 Client.
    */
   protected function getProvider($clientId) {
     $client = $this->getClient($clientId);
@@ -104,8 +107,8 @@ abstract class Oauth2ClientGrantServiceBase extends Oauth2ClientServiceBase impl
   /**
    * Retrieves the local redirect URI used for OAuth2 authentication.
    *
-   * @param Drupal\oauth2_client\Plugin\Oauth2Client\Oauth2ClientPluginInterface $client
-   *   The OAuth2 Client Plugin for which the redirect URI should be retieved.
+   * @param \Drupal\oauth2_client\Plugin\Oauth2Client\Oauth2ClientPluginInterface $client
+   *   The OAuth2 Client Plugin for which the redirect URI should be retrieved.
    *
    * @return string
    *   The redirect URI for the given OAuth2 Server client.
