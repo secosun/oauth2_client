@@ -17,7 +17,7 @@ class AuthorizationCodeGrantService extends Oauth2ClientGrantServiceBase {
   /**
    * The Drupal tempstore.
    *
-   * @var \Drupal\Core\PrivateTempStore
+   * @var \Drupal\Core\TempStore\PrivateTempStore
    */
   protected $tempstore;
 
@@ -32,7 +32,7 @@ class AuthorizationCodeGrantService extends Oauth2ClientGrantServiceBase {
    *   The URL generator service.
    * @param \Drupal\oauth2_client\PluginManager\Oauth2ClientPluginManagerInterface $oauth2ClientPluginManager
    *   The OAuth2 Client plugin manager.
-   * @param \Drupal\user\PrivateTempStoreFactory $tempstoreFactory
+   * @param \Drupal\Core\TempStore\PrivateTempStoreFactory $tempstoreFactory
    *   The Drupal private tempstore factory.
    */
   public function __construct(
