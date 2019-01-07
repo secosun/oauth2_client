@@ -27,7 +27,7 @@ class Oauth2ClientPluginManager extends DefaultPluginManager implements Oauth2Cl
   public function __construct(Traversable $namespaces, CacheBackendInterface $cacheBackend, ModuleHandlerInterface $moduleHandler) {
     parent::__construct('Plugin/Oauth2Client', $namespaces, $moduleHandler, 'Drupal\oauth2_client\Plugin\Oauth2Client\Oauth2ClientPluginInterface', 'Drupal\oauth2_client\Annotation\Oauth2Client');
 
-    $this->alterInfo('oauth2_client');
+    $this->alterInfo('oauth2_client_info');
     $this->setCacheBackend($cacheBackend, 'oauth2_client');
   }
 
