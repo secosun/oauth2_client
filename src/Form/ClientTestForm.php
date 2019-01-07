@@ -27,7 +27,7 @@ class ClientTestForm extends FormBase {
   /**
    * The Drupal tempstore.
    *
-   * @var \Drupal\Core\PrivateTempStore
+   * @var \Drupal\Core\TempStore\PrivateTempStore
    */
   protected $tempstore;
 
@@ -48,20 +48,20 @@ class ClientTestForm extends FormBase {
   /**
    * The OAuth2 Client service.
    *
-   * @var Drupal\oauth2_client\Service\Oauth2ClientServiceInterface
+   * @var \Drupal\oauth2_client\Service\Oauth2ClientServiceInterface
    */
   protected $oauth2ClientService;
 
   /**
    * Constructs a ClientTestForm object.
    *
-   * @param Symfony\Component\HttpFoundation\RequestStack $requestStack
+   * @param \Symfony\Component\HttpFoundation\RequestStack $requestStack
    *   The request stack.
-   * @param \Drupal\Core\PrivateTempStoreFactory $tempstoreFactory
+   * @param \Drupal\Core\TempStore\PrivateTempStoreFactory $tempstoreFactory
    *   The Drupal private tempstore factory.
    * @param \Drupal\Core\Routing\UrlGeneratorInterface $urlGenerator
    *   The URL generator service.
-   * @param \\Drupal\oauth2_client\PluginManager\Oauth2ClientPluginManagerInterface $oauth2ClientPluginManager
+   * @param \Drupal\oauth2_client\PluginManager\Oauth2ClientPluginManagerInterface $oauth2ClientPluginManager
    *   The OAuth2 Client plugin manager.
    * @param \Drupal\oauth2_client\Service\Oauth2ClientServiceInterface $oauth2ClientService
    *   The OAuth2 client service.
@@ -120,10 +120,10 @@ class ClientTestForm extends FormBase {
        * as the URL of the page on which the form exists (using the special
        * <current> route). The problem is that when the user is redirected back,
        * we need to re-request the access token, using the state and code values
-       * from the URL. This all works fine, however leaving the 'code' and 'state'
-       * variables in the URL causes issues on further form submissions, so to get
-       * around it, the user is redirected back to this same form without
-       * the code and state variables in it.
+       * from the URL. This all works fine, however leaving the 'code' and
+       * 'state' variables in the URL causes issues on further form submissions,
+       * so to get around it, the user is redirected back to this same form
+       * without the code and state variables in it.
        */
       // Only do something if the state parameter exists in the URL.
       if ($state = $this->currentRequest->query->get('state')) {
@@ -172,8 +172,8 @@ class ClientTestForm extends FormBase {
         '#default_value' => $definition_key,
       ];
 
-      // A non-AJAX submit button is used, as the redirects with OAuth2 don't work
-      // well with AJAX.
+      // A non-AJAX submit button is used, as the redirects with OAuth2 don't
+      // work well with AJAX.
       $form['plugin']['set_plugin'] = [
         '#type' => 'submit',
         '#value' => $this->t('Apply'),
