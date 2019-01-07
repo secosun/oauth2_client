@@ -2,13 +2,10 @@
 
 namespace Drupal\oauth2_client\Exception;
 
-use Exception;
-use Throwable;
-
 /**
  * Exception thrown when the Oauth2 Client plugin is missing a required key.
  */
-class Oauth2ClientPluginMissingKeyException extends Exception {
+class Oauth2ClientPluginMissingKeyException extends \Exception {
 
   /**
    * Constructs an Oauth2ClientPluginMissingKeyException object.
@@ -22,7 +19,7 @@ class Oauth2ClientPluginMissingKeyException extends Exception {
    * @param \Throwable $previous
    *   The previous exception used for the exception chaining.
    */
-  public function __construct($key, $message = "", $code = 0, Throwable $previous = NULL) {
+  public function __construct($key, $message = "", $code = 0, \Throwable $previous = NULL) {
     if ($message == "") {
       $message = 'The Oauth2 Client plugin is missing required key: ' . $key;
     }

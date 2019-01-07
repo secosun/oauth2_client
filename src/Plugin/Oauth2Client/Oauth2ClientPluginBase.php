@@ -159,7 +159,7 @@ abstract class Oauth2ClientPluginBase extends PluginBase implements Oauth2Client
    * @param string $key
    *   The key to check.
    *
-   * @throws Drupal\oauth2_client\Exception\Oauth2ClientPluginMissingKeyException
+   * @throws \Drupal\oauth2_client\Exception\Oauth2ClientPluginMissingKeyException
    *   Thrown if the key being checked is not defined.
    */
   private function checkKeyDefined($key) {

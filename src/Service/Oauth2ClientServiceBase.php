@@ -2,6 +2,8 @@
 
 namespace Drupal\oauth2_client\Service;
 
+use Drupal\oauth2_client\Exception\InvalidOauth2ClientException;
+
 /**
  * Base class for OAuth2 Client services.
  */
@@ -15,7 +17,7 @@ abstract class Oauth2ClientServiceBase implements Oauth2ClientServiceInterface {
     if (!isset($clients[$clientId])) {
       $definition = $this->oauth2ClientPluginManager->getDefinition($clientId);
       if (!$definition || !isset($definition['id'])) {
-        throw new InvalidOauth2ClientException($client);
+        throw new InvalidOauth2ClientException($clientId);
       }
 
       $clients[$clientId] = $this->oauth2ClientPluginManager->createInstance($definition['id']);

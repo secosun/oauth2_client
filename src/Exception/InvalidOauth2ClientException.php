@@ -1,12 +1,11 @@
 <?php
 
-use Exception;
-use Throwable;
+namespace Drupal\oauth2_client\Exception;
 
 /**
  * Exception thrown when trying to retrieve a non-existent OAuth2 Client.
  */
-class InvalidOauth2ClientException extends Exception {
+class InvalidOauth2ClientException extends \Exception {
 
   /**
    * Constructs an InvalidOauth2ClientException object.
@@ -20,10 +19,10 @@ class InvalidOauth2ClientException extends Exception {
    * @param \Throwable $previous
    *   The previous exception used for the exception chaining.
    */
-  public function __construct($invalidClientId, $message = "", $code = 0, Throwable $previous = NULL) {
+  public function __construct($invalidClientId, $message = "", $code = 0, \Throwable $previous = NULL) {
     if ($message == "") {
       if (is_scalar($invalidClientId)) {
-        $message = "The OAuth2 CLient plugin ''"$plugin_id . "' does not exist";
+        $message = "The OAuth2 Client plugin ''" . $invalidClientId . "' does not exist";
       }
       else {
         $message = "An invalid value was passed for the OAuth2 Plugin ID";
