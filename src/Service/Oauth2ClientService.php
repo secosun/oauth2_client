@@ -14,7 +14,7 @@ class Oauth2ClientService extends Oauth2ClientServiceBase {
   /**
    * The OAuth2 Client plugin manager.
    *
-   * @var Drupal\oauth2_client\PluginManager\Oauth2ClientPluginManagerInterface
+   * @var \Drupal\oauth2_client\PluginManager\Oauth2ClientPluginManagerInterface
    */
   protected $oauth2ClientPluginManager;
 
