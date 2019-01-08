@@ -4,6 +4,7 @@ namespace Drupal\oauth2_client\Form;
 
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Form\FormBase;
+use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\Routing\UrlGeneratorInterface;
 use Drupal\Core\TempStore\PrivateTempStoreFactory;
 use Drupal\oauth2_client\PluginManager\Oauth2ClientPluginManagerInterface;
@@ -65,19 +66,23 @@ class ClientTestForm extends FormBase {
    *   The OAuth2 Client plugin manager.
    * @param \Drupal\oauth2_client\Service\Oauth2ClientServiceInterface $oauth2ClientService
    *   The OAuth2 client service.
+   * @param \Drupal\Core\Routing\RouteMatchInterface $currentRouteMatch
+   *   Current route match.
    */
   public function __construct(
     RequestStack $requestStack,
     PrivateTempStoreFactory $tempstoreFactory,
     UrlGeneratorInterface $urlGenerator,
     Oauth2ClientPluginManagerInterface $oauth2ClientPluginManager,
-    Oauth2ClientServiceInterface $oauth2ClientService
+    Oauth2ClientServiceInterface $oauth2ClientService,
+    RouteMatchInterface $currentRouteMatch
   ) {
     $this->currentRequest = $requestStack->getCurrentRequest();
     $this->tempstore = $tempstoreFactory->get('oauth2_client');
     $this->urlGenerator = $urlGenerator;
     $this->oauth2ClientPluginManager = $oauth2ClientPluginManager;
     $this->oauth2ClientService = $oauth2ClientService;
+    $this->routeMatch = $currentRouteMatch;
   }
 
   /**
@@ -89,7 +94,8 @@ class ClientTestForm extends FormBase {
       $container->get('tempstore.private'),
       $container->get('url_generator'),
       $container->get('oauth2_client.plugin_manager'),
-      $container->get('oauth2_client.service')
+      $container->get('oauth2_client.service'),
+      $container->get('current_route_match')
     );
   }
 
@@ -161,7 +167,7 @@ class ClientTestForm extends FormBase {
       // Determine the definition plugin that should be displayed (if any).
       $definition_key = $form_state->getValue('oauth2_client_plugin');
       if (!$definition_key) {
-        $definition_key = $this->currentRequest->query->get('plugin');
+        $definition_key = $this->routeMatch->getParameter('plugin');
       }
 
       // Create a select list of plugins, so users can choose a plugin to test.
@@ -273,10 +279,10 @@ class ClientTestForm extends FormBase {
     // OAuth2 servers back to this page). As such, when a plugin is selected,
     // a redirect needs to happen.
     if ($plugin = $form_state->getValue('oauth2_client_plugin')) {
-      $form_state->setRedirect('<current>', ['plugin' => $plugin]);
+      $form_state->setRedirect('oauth2_client.reports.tester.plugin', ['plugin' => $plugin]);
     }
     else {
-      $form_state->setRedirect('<current>');
+      $form_state->setRedirect('oauth2_client.reports.tester');
     }
   }
 

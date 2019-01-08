@@ -13,3 +13,11 @@ oauth2_client.reports.tester:
     _title: 'Client Tester'
   requirements:
     _permission: 'test oauth2 clients'
+
+oauth2_client.reports.tester.plugin:
+  path: '/admin/reports/oauth2_client/client_tester/{plugin}'
+  defaults:
+    _controller: '\Drupal\oauth2_client\Controller\PageController::clientTestPage'
+    _title: 'Client Tester'
+  requirements:
+    _permission: 'test oauth2 clients'

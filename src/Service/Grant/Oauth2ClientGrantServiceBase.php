@@ -114,7 +114,7 @@ abstract class Oauth2ClientGrantServiceBase extends Oauth2ClientServiceBase impl
    *   The redirect URI for the given OAuth2 Server client.
    */
   private function getRedirectUri(Oauth2ClientPluginInterface $client) {
-    return $this->urlGenerator->generateFromRoute('<current>', ['plugin' => $client->getId()], ['absolute' => TRUE]);
+    return $this->urlGenerator->generateFromRoute('<current>', [], ['absolute' => TRUE]);
   }
 
 }
