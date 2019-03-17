@@ -102,13 +102,19 @@ class Oauth2ClientService extends Oauth2ClientServiceBase {
     $stored_token = $this->retrieveAccessToken($clientId);
     if ($stored_token) {
       if ($stored_token->getExpires() && $stored_token->hasExpired()) {
-        $access_token = $this->grantServices['refresh_token']->getAccessToken($clientId);
+        if (empty($stored_token->getRefreshToken())) {
+          # Token is expired but we have no refresh_token. Just get a new one.
+          $access_token = NULL;
+        }
+        else {
+          $access_token = $this->grantServices['refresh_token']->getAccessToken($clientId);
+        }
       }
       else {
         $access_token = $stored_token;
       }
     }
-    else {
+    if (empty($access_token)) {
       $access_token = $this->grantServices['authorization_code']->getAccessToken($clientId);
     }
 
