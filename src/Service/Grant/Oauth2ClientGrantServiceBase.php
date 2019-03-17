@@ -89,6 +89,8 @@ abstract class Oauth2ClientGrantServiceBase extends Oauth2ClientServiceBase impl
       'urlAuthorize' => $client->getAuthorizationUri(),
       'urlAccessToken' => $client->getTokenUri(),
       'urlResourceOwnerDetails' => $client->getResourceUri(),
+      'scopes' => $client->getScopes(),
+      'scopeSeparator' => $client->getScopeSeparator(),
     ]);
   }
 
