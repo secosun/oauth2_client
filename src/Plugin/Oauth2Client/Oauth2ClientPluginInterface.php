@@ -33,7 +33,7 @@ interface Oauth2ClientPluginInterface extends PluginInspectionInterface, Contain
    *   Possible values:
    *   - authorization_code
    *   - client_credentials
-   *   - refresh_toekn
+   *   - refresh_token
    *   - resource_owner
    */
   public function getGrantType();
