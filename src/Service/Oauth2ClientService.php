@@ -93,6 +93,26 @@ class Oauth2ClientService extends Oauth2ClientServiceBase {
   }
 
   /**
+   * {@inheritdoc}
+   */
+  public function getProvider($clientId) {
+    $client = $this->getClient($clientId);
+    switch ($client->getGrantType()) {
+      case 'client_credentials':
+        $provider = $this->getClientCredentialsProvider($clientId);
+        break;
+      case 'resource_owner':
+        $provider = $this->getResourceOwnersCredentialsProvider($clientId);
+        break;
+      case 'authorization_code':
+      default:
+        $provider = $this->getAuthorizationCodeProvider($clientId);
+        break;
+    }
+    return $provider;
+  }
+
+  /**
    * Retrieves an access token for the 'authorization_code' grant type.
    *
    * @return \League\OAuth2\Client\Token\AccessTokenInterface
@@ -122,6 +142,17 @@ class Oauth2ClientService extends Oauth2ClientServiceBase {
   }
 
   /**
+   * Retrieves the league/oauth2-client provider for the 'authorization_code'
+   * grant type.
+   *
+   * @return \League\OAuth2\Client\Provider\AbstractProvider
+   *   The Provider for the given client ID.
+   */
+  private function getAuthorizationCodeProvider($clientId) {
+    return $this->grantServices['authorization_code']->getGrantProvider($clientId);
+  }
+
+  /**
    * Retrieves an access token for the 'client_credentials' grant type.
    *
    * @return \League\OAuth2\Client\Token\AccessTokenInterface
@@ -138,6 +169,17 @@ class Oauth2ClientService extends Oauth2ClientServiceBase {
   }
 
   /**
+   * Retrieves the league/oauth2-client provider for the 'client_credentials'
+   * grant type.
+   *
+   * @return \League\OAuth2\Client\Provider\AbstractProvider
+   *   The Provider for the given client ID.
+   */
+  private function getClientCredentialsProvider($clientId) {
+    return $this->grantServices['client_credentials']->getGrantProvider($clientId);
+  }
+
+  /**
    * Retrieves an access token for the 'resource_owner' grant type.
    *
    * @return \League\OAuth2\Client\Token\AccessTokenInterface
@@ -151,6 +193,17 @@ class Oauth2ClientService extends Oauth2ClientServiceBase {
     }
 
     return $access_token;
+  }
+
+  /**
+   * Retrieves the league/oauth2-client provider for the 'resource_owner' grant
+   * type.
+   *
+   * @return \League\OAuth2\Client\Provider\AbstractProvider
+   *   The Provider for the given client ID.
+   */
+  private function getResourceOwnersCredentialsProvider($clientId) {
+    return $this->grantServices['resource_owner']->getGrantProvider($clientId);
   }
 
 }
