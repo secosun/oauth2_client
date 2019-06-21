@@ -158,3 +158,17 @@ function oauth2_client_set_token($id, $token) {
 function oauth2_client_get_token($id) {
   return OAuth2\Client::loadToken($id);
 }
+
+/**
+ * Revokes an access token on the server.
+ *
+ * @param string $client_id
+ *   Name of the client.
+ *
+ * @return bool
+ *   Returns TRUE if the revocation was successful, otherwise FALSE.
+ */
+function oauth2_client_revoke_token($client_id) {
+  $client = oauth2_client_load($client_id);
+  return $client->revokeToken();
+}

@@ -1,16 +1,16 @@
 <?php
+
 namespace OAuth2;
 
 /**
  * @file
- * Class OAuth2\Client
+ * Class OAuth2\Client.
  */
 
 /**
- * The class OAuth2\Client is used to get authorization from
- * an oauth2 server. Its only goal is to get an access_token
- * from the oauth2 server, so the only public function
- * (besides the constructor) is getAccessToken().
+ * The class OAuth2\Client is used to communicate with an oauth2 server.
+ *
+ * Its goal is getting and revoking access_tokens.
  *
  * It can use authorization flows: server-side, client-credentials
  * and user-password. The details for each case are passed
@@ -35,8 +35,10 @@ class Client {
    *  - client_secret :: Client secret, as registered on the oauth2 server
    *  - token_endpoint :: something like:
    *       https://oauth2_server.example.org/oauth2/token
-   *  - authorization_endpoint :: somethig like:
+   *  - authorization_endpoint :: something like:
    *       https://oauth2_server.example.org/oauth2/authorize
+   *  - revoke_endpoint :: something like:
+   *       https://oauth2_server.example.org/oauth2/revoke
    *  - redirect_uri :: something like:
    *       url('oauth2/authorized', array('absolute' => TRUE)) or
    *       https://oauth2_client.example.org/oauth2/authorized
@@ -54,6 +56,7 @@ class Client {
     'client_secret' => NULL,
     'token_endpoint' => NULL,
     'authorization_endpoint' => NULL,
+    'revoke_endpoint' => NULL,
     'redirect_uri' => NULL,
     'scope' => NULL,
     'username' => NULL,
@@ -467,6 +470,41 @@ class Client {
     }
 
     return $token;
+  }
+
+  /**
+   * Revokes an access token on the server.
+   *
+   * @return bool
+   *   Returns TRUE if the revocation was successful, otherwise FALSE.
+   */
+  public function revokeToken() {
+    $data = array('token' => $this->token['access_token']);
+    $client_id = $this->params['client_id'];
+    $client_secret = $this->params['client_secret'];
+    $revoke_endpoint = $this->params['revoke_endpoint'];
+
+    $options = array(
+      'method' => 'POST',
+      'data' => drupal_http_build_query($data),
+      'headers' => array(
+        'Content-Type' => 'application/x-www-form-urlencoded',
+        'Authorization' => 'Basic ' . base64_encode("$client_id:$client_secret"),
+      ),
+    );
+    if ($this->params['skip-ssl-verification']) {
+      $options['context'] = stream_context_create(array(
+        'ssl' => array(
+          'verify_peer' => FALSE,
+          'verify_peer_name' => FALSE,
+        ),
+      ));
+    }
+
+    $result = drupal_http_request($revoke_endpoint, $options);
+    $this->clearToken();
+
+    return $result->code == 200;
   }
 
 }

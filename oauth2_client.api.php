@@ -7,7 +7,7 @@
 /**
  * Define oauth2 clients.
  *
- * @return Array
+ * @return array
  *   Associative array of oauth2 clients.
  */
 function hook_oauth2_clients() {
@@ -19,6 +19,7 @@ function hook_oauth2_clients() {
   // Using user-password flow.
   $oauth2_clients['test1'] = array(
     'token_endpoint' => $server_url . '/oauth2/token',
+    'revoke_endpoint' => $server_url . '/oauth2/revoke',
     'auth_flow' => 'user-password',
     'client_id' => 'client1',
     'client_secret' => 'secret1',
