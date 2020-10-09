@@ -43,6 +43,7 @@ class Client {
    *       url('oauth2/authorized', array('absolute' => TRUE)) or
    *       https://oauth2_client.example.org/oauth2/authorized
    *  - scope :: requested scopes, separated by a space
+   *  - resource :: the identifier of the WebAPI the client wants to access
    *  - username :: username of the resource owner
    *  - password :: password of the resource owner
    *  - skip-ssl-verification :: Skip verification of the SSL connection
@@ -59,6 +60,7 @@ class Client {
     'revoke_endpoint' => NULL,
     'redirect_uri' => NULL,
     'scope' => NULL,
+    'resource' => NULL,
     'username' => NULL,
     'password' => NULL,
     'skip-ssl-verification' => FALSE,
@@ -344,6 +346,7 @@ class Client {
     return $this->getToken(array(
         'grant_type' => 'authorization_code',
         'code' => $_GET['code'],
+        'resource' => $this->params['resource'],
         'redirect_uri' => $this->params['redirect_uri'],
       ));
   }
@@ -361,6 +364,9 @@ class Client {
     );
     if ($this->params['scope']) {
       $query_params['scope'] = $this->params['scope'];
+    }
+    if ($this->params['resource']) {
+      $query_params['resource'] = $this->params['resource'];
     }
     $endpoint = $this->params['authorization_endpoint'];
     static::setRedirect($state);
