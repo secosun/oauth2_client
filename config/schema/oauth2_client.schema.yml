@@ -1,0 +1,23 @@
+oauth2_client.credentials.*:
+  type: mapping
+  label: 'Oauth2 Client Credentials'
+  mapping:
+    id:
+      label: 'Plugin ID'
+      type: string
+    uuid:
+      label: 'UUID'
+      type: string
+    credentials:
+      type: mapping
+      label: 'Credential data'
+      mapping:
+        credential_provider:
+          type: string
+          label: 'Credential provider'
+        storage_key:
+          type: string
+          label: 'Storage identifier'
+
+key.type.oauth2_client:
+  type: sequence

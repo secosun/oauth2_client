@@ -12,32 +12,32 @@ abstract class Oauth2ClientServiceBase implements Oauth2ClientServiceInterface {
   /**
    * {@inheritdoc}
    */
-  public function getClient($clientId) {
+  public function getClient($pluginId) {
     $clients = &drupal_static(__CLASS__ . '::' . __FUNCTION__, []);
-    if (!isset($clients[$clientId])) {
-      $definition = $this->oauth2ClientPluginManager->getDefinition($clientId);
+    if (!isset($clients[$pluginId])) {
+      $definition = $this->oauth2ClientPluginManager->getDefinition($pluginId);
       if (!$definition || !isset($definition['id'])) {
-        throw new InvalidOauth2ClientException($clientId);
+        throw new InvalidOauth2ClientException($pluginId);
       }
 
-      $clients[$clientId] = $this->oauth2ClientPluginManager->createInstance($definition['id']);
+      $clients[$pluginId] = $this->oauth2ClientPluginManager->createInstance($definition['id']);
     }
 
-    return $clients[$clientId];
+    return $clients[$pluginId];
   }
 
   /**
    * {@inheritdoc}
    */
-  public function retrieveAccessToken($clientId) {
-    return $this->state->get('oauth2_client_access_token-' . $clientId);
+  public function retrieveAccessToken($pluginId) {
+    return $this->state->get('oauth2_client_access_token-' . $pluginId);
   }
 
   /**
    * {@inheritdoc}
    */
-  public function clearAccessToken($clientId) {
-    return $this->state->delete('oauth2_client_access_token-' . $clientId);
+  public function clearAccessToken($pluginId) {
+    return $this->state->delete('oauth2_client_access_token-' . $pluginId);
   }
 
 }

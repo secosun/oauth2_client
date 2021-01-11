@@ -5,6 +5,7 @@ namespace Drupal\oauth2_client\Service;
 use Drupal\Core\State\StateInterface;
 use Drupal\oauth2_client\PluginManager\Oauth2ClientPluginManagerInterface;
 use Drupal\oauth2_client\Service\Grant\Oauth2ClientGrantServiceInterface;
+use Drupal\oauth2_client\Service\Grant\ResourceOwnersCredentialsGrantService;
 
 /**
  * The OAuth2 Client service.
@@ -54,7 +55,7 @@ class Oauth2ClientService extends Oauth2ClientServiceBase {
     Oauth2ClientGrantServiceInterface $authorizationCodeGrantService,
     Oauth2ClientGrantServiceInterface $clientCredentialsGrantService,
     Oauth2ClientGrantServiceInterface $refreshTokenGrantService,
-    Oauth2ClientGrantServiceInterface $resourceOwnersCredentialsGrantService
+    ResourceOwnersCredentialsGrantService $resourceOwnersCredentialsGrantService
   ) {
     $this->oauth2ClientPluginManager = $oauth2ClientPluginManager;
     $this->state = $state;
@@ -67,9 +68,21 @@ class Oauth2ClientService extends Oauth2ClientServiceBase {
   }
 
   /**
-   * {@inheritdoc}
+   * Obtains an existing or a new access token.
+   *
+   * @param string $clientId
+   *   The Oauth2Client plugin id.
+   * @param string $username
+   *   Optional - The username if needed by the grant type.
+   * @param string $password
+   *   Optional - The password if needed by the grant type.
+   *
+   * @return \League\OAuth2\Client\Token\AccessTokenInterface|null
+   *   Returns a token or null.
+   *
+   * @throws \Drupal\oauth2_client\Exception\InvalidOauth2ClientException
    */
-  public function getAccessToken($clientId) {
+  public function getAccessToken($clientId, $username = '', $password = '') {
     $access_token = $this->retrieveAccessToken($clientId);
     if (!$access_token || ($access_token->getExpires() && $access_token->hasExpired())) {
       $client = $this->getClient($clientId);
@@ -84,7 +97,7 @@ class Oauth2ClientService extends Oauth2ClientServiceBase {
           break;
 
         case 'resource_owner':
-          $access_token = $this->getResourceOwnersCredentialsAccessToken($clientId);
+          $access_token = $this->getResourceOwnersCredentialsAccessToken($clientId, $username, $password);
           break;
       }
     }
@@ -115,11 +128,14 @@ class Oauth2ClientService extends Oauth2ClientServiceBase {
   /**
    * Retrieves an access token for the 'authorization_code' grant type.
    *
+   * @param string $pluginId
+   *   The id of the Oauth2Client plugin implementing this grant type.
+   *
    * @return \League\OAuth2\Client\Token\AccessTokenInterface
    *   The Access Token for the given client ID.
    */
-  private function getAuthorizationCodeAccessToken($clientId) {
-    $stored_token = $this->retrieveAccessToken($clientId);
+  private function getAuthorizationCodeAccessToken($pluginId) {
+    $stored_token = $this->retrieveAccessToken($pluginId);
     if ($stored_token) {
       if ($stored_token->getExpires() && $stored_token->hasExpired()) {
         if (empty($stored_token->getRefreshToken())) {
@@ -127,7 +143,7 @@ class Oauth2ClientService extends Oauth2ClientServiceBase {
           $access_token = NULL;
         }
         else {
-          $access_token = $this->grantServices['refresh_token']->getAccessToken($clientId);
+          $access_token = $this->grantServices['refresh_token']->getAccessToken($pluginId);
         }
       }
       else {
@@ -135,7 +151,7 @@ class Oauth2ClientService extends Oauth2ClientServiceBase {
       }
     }
     if (empty($access_token)) {
-      $access_token = $this->grantServices['authorization_code']->getAccessToken($clientId);
+      $access_token = $this->grantServices['authorization_code']->getAccessToken($pluginId);
     }
 
     return $access_token;
@@ -145,24 +161,30 @@ class Oauth2ClientService extends Oauth2ClientServiceBase {
    * Retrieves the league/oauth2-client provider for the 'authorization_code'
    * grant type.
    *
+   * @param string $pluginId
+   *   The id of the Oauth2Client plugin implementing this grant type.
+   *
    * @return \League\OAuth2\Client\Provider\AbstractProvider
    *   The Provider for the given client ID.
    */
-  private function getAuthorizationCodeProvider($clientId) {
-    return $this->grantServices['authorization_code']->getGrantProvider($clientId);
+  private function getAuthorizationCodeProvider($pluginId) {
+    return $this->grantServices['authorization_code']->getGrantProvider($pluginId);
   }
 
   /**
    * Retrieves an access token for the 'client_credentials' grant type.
    *
+   * @param string $pluginId
+   *   The id of the Oauth2Client plugin implementing this grant type.
+   *
    * @return \League\OAuth2\Client\Token\AccessTokenInterface
    *   The Access Token for the given client ID.
    */
-  private function getClientCredentialsAccessToken($clientId) {
-    $access_token = $this->retrieveAccessToken($clientId);
+  private function getClientCredentialsAccessToken($pluginId) {
+    $access_token = $this->retrieveAccessToken($pluginId);
 
     if (!$access_token) {
-      $access_token = $this->grantServices['client_credentials']->getAccessToken($clientId);
+      $access_token = $this->grantServices['client_credentials']->getAccessToken($pluginId);
     }
 
     return $access_token;
@@ -172,24 +194,34 @@ class Oauth2ClientService extends Oauth2ClientServiceBase {
    * Retrieves the league/oauth2-client provider for the 'client_credentials'
    * grant type.
    *
+   * @param string $pluginId
+   *   The id of the Oauth2Client plugin implementing this grant type.
+   *
    * @return \League\OAuth2\Client\Provider\AbstractProvider
    *   The Provider for the given client ID.
    */
-  private function getClientCredentialsProvider($clientId) {
-    return $this->grantServices['client_credentials']->getGrantProvider($clientId);
+  private function getClientCredentialsProvider($pluginId) {
+    return $this->grantServices['client_credentials']->getGrantProvider($pluginId);
   }
 
   /**
    * Retrieves an access token for the 'resource_owner' grant type.
    *
+   * @param string $pluginId
+   *   The id of the Oauth2Client plugin implementing this grant type.
+   * @param string $username
+   *  The username if needed by the grant type.
+   * @param string $password
+   *   The password if needed by the grant type.
+   *
    * @return \League\OAuth2\Client\Token\AccessTokenInterface
    *   The Access Token for the given client ID.
    */
-  private function getResourceOwnersCredentialsAccessToken($clientId) {
-    $access_token = $this->retrieveAccessToken($clientId);
+  private function getResourceOwnersCredentialsAccessToken($pluginId, $username, $password) {
+    $access_token = $this->retrieveAccessToken($pluginId);
 
     if (!$access_token) {
-      $access_token = $this->grantServices['resource_owner']->getAccessToken($clientId);
+      $access_token = $this->grantServices['resource_owner']->getAccessToken($pluginId, $username, $password);
     }
 
     return $access_token;
@@ -199,11 +231,14 @@ class Oauth2ClientService extends Oauth2ClientServiceBase {
    * Retrieves the league/oauth2-client provider for the 'resource_owner' grant
    * type.
    *
+   * @param $pluginId
+   *   The id of the Oauth2Client plugin implementing this grant type.
+   *
    * @return \League\OAuth2\Client\Provider\AbstractProvider
    *   The Provider for the given client ID.
    */
-  private function getResourceOwnersCredentialsProvider($clientId) {
-    return $this->grantServices['resource_owner']->getGrantProvider($clientId);
+  private function getResourceOwnersCredentialsProvider($pluginId) {
+    return $this->grantServices['resource_owner']->getGrantProvider($pluginId);
   }
 
 }

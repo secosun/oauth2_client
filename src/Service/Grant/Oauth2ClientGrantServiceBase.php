@@ -6,6 +6,7 @@ use Drupal\Core\Routing\UrlGeneratorInterface;
 use Drupal\Core\State\StateInterface;
 use Drupal\oauth2_client\Plugin\Oauth2Client\Oauth2ClientPluginInterface;
 use Drupal\oauth2_client\PluginManager\Oauth2ClientPluginManagerInterface;
+use Drupal\oauth2_client\Service\CredentialProvider;
 use Drupal\oauth2_client\Service\Oauth2ClientServiceBase;
 use League\OAuth2\Client\Provider\GenericProvider;
 use League\OAuth2\Client\Token\AccessToken;

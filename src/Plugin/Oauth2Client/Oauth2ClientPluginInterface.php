@@ -2,13 +2,15 @@
 
 namespace Drupal\oauth2_client\Plugin\Oauth2Client;
 
+use Drupal\Component\Plugin\ConfigurableInterface;
 use Drupal\Component\Plugin\PluginInspectionInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
+use Drupal\Core\Plugin\PluginFormInterface;
 
 /**
  * Interface for Oauth2 Client plugins.
  */
-interface Oauth2ClientPluginInterface extends PluginInspectionInterface, ContainerFactoryPluginInterface {
+interface Oauth2ClientPluginInterface extends PluginInspectionInterface, ContainerFactoryPluginInterface, PluginFormInterface, ConfigurableInterface {
 
   /**
    * Retrieves the human-readable name of the Oauth2 Client plugin.
@@ -103,19 +105,19 @@ interface Oauth2ClientPluginInterface extends PluginInspectionInterface, Contain
   public function getScopeSeparator();
 
   /**
-   * Retrieves the username for the account to authenticate with.
+   * Returns the plugin credentials if they are set, otherwise returns NULL.
    *
-   * @return string
-   *   The username of the account to authenticate with.
+   * @return string|null
+   *   The data.
    */
-  public function getUsername();
+  public function getCredentialProvider();
 
   /**
-   * Retrieves the password for the account to authenticate with.
+   * Returns the credential storage key if it is set, otherwise returns NULL.
    *
-   * @return string
-   *   The password for the account to authenticate with.
+   * @return mixed|null
+   *   The data.
    */
-  public function getPassword();
+  public function getStorageKey();
 
 }

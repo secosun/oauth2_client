@@ -5,7 +5,6 @@ namespace Drupal\oauth2_client\PluginManager;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Plugin\DefaultPluginManager;
-use Traversable;
 
 /**
  * The OAuth 2 Client plugin manager.
@@ -24,7 +23,7 @@ class Oauth2ClientPluginManager extends DefaultPluginManager implements Oauth2Cl
    * @param \Drupal\Core\Extension\ModuleHandlerInterface $moduleHandler
    *   The module handler service.
    */
-  public function __construct(Traversable $namespaces, CacheBackendInterface $cacheBackend, ModuleHandlerInterface $moduleHandler) {
+  public function __construct(\Traversable $namespaces, CacheBackendInterface $cacheBackend, ModuleHandlerInterface $moduleHandler) {
     parent::__construct('Plugin/Oauth2Client', $namespaces, $moduleHandler, 'Drupal\oauth2_client\Plugin\Oauth2Client\Oauth2ClientPluginInterface', 'Drupal\oauth2_client\Annotation\Oauth2Client');
 
     $this->alterInfo('oauth2_client_info');
