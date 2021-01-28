@@ -30,11 +30,7 @@ class Oauth2Client extends Plugin {
   /**
    * The grant type of the OAuth2 authorization.
    *
-   * Possible values:
-   * - authorization_code
-   * - client_credentials
-   * - resource_owner - Note that the 'username' and 'password' attributes are
-   *   required for this type.
+   * Possible values are authorization_code, client_credentials, resource_owner.
    *
    * @var string
    */
@@ -81,5 +77,14 @@ class Oauth2Client extends Plugin {
    * @var string|null
    */
   public $scope_separator;
+
+  /**
+   * A flag that may be used by Oauth2ClientPluginInterface::storeAccessToken.
+   *
+   * Implementations may conditionally display a message on successful storage.
+   *
+   * @var bool
+   */
+  public $success_message;
 
 }

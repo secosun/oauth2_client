@@ -4,12 +4,10 @@ namespace Drupal\oauth2_client\Service\Grant;
 
 use Drupal\Core\Routing\UrlGeneratorInterface;
 use Drupal\Core\State\StateInterface;
-use Drupal\oauth2_client\Plugin\Oauth2Client\Oauth2ClientPluginInterface;
-use Drupal\oauth2_client\PluginManager\Oauth2ClientPluginManagerInterface;
-use Drupal\oauth2_client\Service\CredentialProvider;
+use Drupal\oauth2_client\PluginManager\Oauth2ClientPluginManager;
 use Drupal\oauth2_client\Service\Oauth2ClientServiceBase;
 use League\OAuth2\Client\Provider\GenericProvider;
-use League\OAuth2\Client\Token\AccessToken;
+use League\OAuth2\Client\Token\AccessTokenInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
@@ -40,12 +38,12 @@ abstract class Oauth2ClientGrantServiceBase extends Oauth2ClientServiceBase impl
   /**
    * The OAuth2 Client plugin manager.
    *
-   * @var \Drupal\oauth2_client\PluginManager\Oauth2ClientPluginManagerInterface
+   * @var \Drupal\oauth2_client\PluginManager\Oauth2ClientPluginManager
    */
   protected $oauth2ClientPluginManager;
 
   /**
-   * Client provider cache
+   * Client provider cache.
    *
    * @var array
    */
@@ -60,20 +58,20 @@ abstract class Oauth2ClientGrantServiceBase extends Oauth2ClientServiceBase impl
    *   The Drupal state.
    * @param \Drupal\Core\Routing\UrlGeneratorInterface $urlGenerator
    *   The URL generator service.
-   * @param \Drupal\oauth2_client\PluginManager\Oauth2ClientPluginManagerInterface $oauth2ClientPluginManager
+   * @param \Drupal\oauth2_client\PluginManager\Oauth2ClientPluginManager $oauth2ClientPluginManager
    *   The OAuth2 Client plugin manager.
    */
   public function __construct(
     RequestStack $requestStack,
     StateInterface $state,
     UrlGeneratorInterface $urlGenerator,
-    Oauth2ClientPluginManagerInterface $oauth2ClientPluginManager
+    Oauth2ClientPluginManager $oauth2ClientPluginManager
   ) {
     $this->currentRequest = $requestStack->getCurrentRequest();
     $this->state = $state;
     $this->urlGenerator = $urlGenerator;
     $this->oauth2ClientPluginManager = $oauth2ClientPluginManager;
-    $this->clientProviderCache = array();
+    $this->clientProviderCache = [];
   }
 
   /**
@@ -91,13 +89,14 @@ abstract class Oauth2ClientGrantServiceBase extends Oauth2ClientServiceBase impl
   protected function getProvider($clientId) {
     if (isset($this->clientProviderCache[$clientId])) {
       $provider = $this->clientProviderCache[$clientId];
-    } else {
+    }
+    else {
       $client = $this->getClient($clientId);
 
       $provider = new GenericProvider([
         'clientId' => $client->getClientId(),
         'clientSecret' => $client->getClientSecret(),
-        'redirectUri' => $this->getRedirectUri($client),
+        'redirectUri' => $client->getRedirectUri(),
         'urlAuthorize' => $client->getAuthorizationUri(),
         'urlAccessToken' => $client->getTokenUri(),
         'urlResourceOwnerDetails' => $client->getResourceUri(),
@@ -110,28 +109,16 @@ abstract class Oauth2ClientGrantServiceBase extends Oauth2ClientServiceBase impl
   }
 
   /**
-   * Store an access token to the Drupal state.
+   * Store an access token using plugin specific storage.
    *
    * @param string $clientId
    *   The client for which a provider should be created.
-   * @param \League\OAuth2\Client\Token\AccessToken $accessToken
+   * @param \League\OAuth2\Client\Token\AccessTokenInterface $accessToken
    *   The Access Token to be stored.
    */
-  protected function storeAccessToken($clientId, AccessToken $accessToken) {
-    $this->state->set('oauth2_client_access_token-' . $clientId, $accessToken);
-  }
-
-  /**
-   * Retrieves the local redirect URI used for OAuth2 authentication.
-   *
-   * @param \Drupal\oauth2_client\Plugin\Oauth2Client\Oauth2ClientPluginInterface $client
-   *   The OAuth2 Client Plugin for which the redirect URI should be retrieved.
-   *
-   * @return string
-   *   The redirect URI for the given OAuth2 Server client.
-   */
-  private function getRedirectUri(Oauth2ClientPluginInterface $client) {
-    return $this->urlGenerator->generateFromRoute('<current>', [], ['absolute' => TRUE]);
+  protected function storeAccessToken($clientId, AccessTokenInterface $accessToken) {
+    $client = $this->oauth2ClientPluginManager->createInstance($clientId);
+    $client->storeAccessToken($accessToken);
   }
 
 }

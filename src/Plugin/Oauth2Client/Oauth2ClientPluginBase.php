@@ -6,9 +6,11 @@ use Drupal\Component\Utility\NestedArray;
 use Drupal\Component\Uuid\UuidInterface;
 use Drupal\Core\Form\ConfigFormBaseTrait;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Messenger\MessengerInterface;
 use Drupal\Core\Plugin\PluginBase;
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\State\StateInterface;
+use Drupal\Core\Url;
 use Drupal\oauth2_client\Service\CredentialProvider;
 use Drupal\oauth2_client\Exception\Oauth2ClientPluginMissingKeyException;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -56,6 +58,13 @@ abstract class Oauth2ClientPluginBase extends PluginBase implements Oauth2Client
   private $credentials;
 
   /**
+   * The messenger service.
+   *
+   * @var \Drupal\Core\Messenger\MessengerInterface
+   */
+  protected $messenger;
+
+  /**
    * Constructs a Oauth2ClientPluginBase object.
    *
    * @param array $configuration
@@ -72,15 +81,18 @@ abstract class Oauth2ClientPluginBase extends PluginBase implements Oauth2Client
    *   Injected state service.
    * @param \Drupal\Component\Uuid\UuidInterface $uuid
    *   Injected UUID service.
+   * @param \Drupal\Core\Messenger\MessengerInterface $messenger
+   *   Injected message service.
    */
-  public function __construct(
+  final public function __construct(
     array $configuration,
     $plugin_id,
     $plugin_definition,
     ConfigFactoryInterface $configFactory,
     CredentialProvider $credProvider,
     StateInterface $state,
-    UuidInterface $uuid
+    UuidInterface $uuid,
+    MessengerInterface $messenger
   ) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
 
@@ -88,6 +100,7 @@ abstract class Oauth2ClientPluginBase extends PluginBase implements Oauth2Client
     $this->credentialService = $credProvider;
     $this->state = $state;
     $this->uuid = $uuid;
+    $this->messenger = $messenger;
     $this->clearCredentials();
     $this->loadConfiguration($configuration);
   }
@@ -103,7 +116,8 @@ abstract class Oauth2ClientPluginBase extends PluginBase implements Oauth2Client
       $container->get('config.factory'),
       $container->get('oauth2_client.service.credentials'),
       $container->get('state'),
-      $container->get('uuid')
+      $container->get('uuid'),
+      $container->get('messenger')
     );
   }
 
@@ -180,9 +194,6 @@ abstract class Oauth2ClientPluginBase extends PluginBase implements Oauth2Client
       'oauth2_client' => [
         '#type' => 'fieldset',
         '#title' => $this->t('Stored locally'),
-        '#description' => $this->t(
-          'A token will be requested and saved in State storage when this form is submitted.'
-        ),
         'client_id' => [
           '#type' => 'textfield',
           '#title' => $this->t('Client ID'),
@@ -324,9 +335,12 @@ abstract class Oauth2ClientPluginBase extends PluginBase implements Oauth2Client
    * {@inheritdoc}
    */
   public function getRedirectUri() {
-    $this->checkKeyDefined('redirect_uri');
-
-    return $this->pluginDefinition['redirect_uri'];
+    $url = Url::fromRoute(
+      'oauth2_client.code',
+      ['plugin' => $this->getId()],
+      ['absolute' => TRUE]
+    );
+    return $url->toString(TRUE)->getGeneratedUrl();
   }
 
   /**
@@ -466,7 +480,6 @@ abstract class Oauth2ClientPluginBase extends PluginBase implements Oauth2Client
           ':input[data-states-selector="provider"]' => ['value' => 'key'],
         ],
       ],
-      '#description' => $this->t('A token will be requested and saved in State storage when this form is submitted.'),
       'id' => [
         '#type' => 'key_select',
         '#title' => $this->t('Select a stored Key'),
@@ -503,6 +516,13 @@ abstract class Oauth2ClientPluginBase extends PluginBase implements Oauth2Client
   public function getStorageKey() {
     $configuration = $this->getConfiguration();
     return $configuration['credentials']['storage_key'] ?? NULL;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function displaySuccessMessage() {
+    return $this->pluginDefinition['success_message'] ?? FALSE;
   }
 
 }

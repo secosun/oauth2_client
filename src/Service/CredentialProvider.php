@@ -31,7 +31,7 @@ class CredentialProvider {
   /**
    * KeyService constructor.
    *
-   * @param StateInterface $state
+   * @param \Drupal\Core\State\StateInterface $state
    *   The key value store to use.
    */
   public function __construct(StateInterface $state) {

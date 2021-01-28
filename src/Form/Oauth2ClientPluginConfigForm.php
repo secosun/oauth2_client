@@ -5,7 +5,6 @@ namespace Drupal\oauth2_client\Form;
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Form\SubformState;
-use League\OAuth2\Client\Provider\Exception\IdentityProviderException;
 use League\OAuth2\Client\Token\AccessTokenInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -87,7 +86,13 @@ class Oauth2ClientPluginConfigForm extends FormBase {
       '#value' => $this->t('Save configuration'),
       '#button_type' => 'primary',
     ];
-
+    $form['actions']['test'] = [
+      '#type' => 'submit',
+      '#value' => $this->t('Save and request token'),
+      '#submit' => ['::testToken'],
+      '#button_type' => 'secondary',
+    ];
+    $form['#description'] = $this->t('<em>Save</em> will simply save this configuration. <em>Save and request token</em> will save this configuration and then request and store a token for future use.');
     // By default, render the form using system-config-form.html.twig.
     $form['#theme'] = 'system_config_form';
     return $form;
@@ -108,32 +113,46 @@ class Oauth2ClientPluginConfigForm extends FormBase {
   public function submitForm(array &$form, FormStateInterface $form_state) {
     $subformState = SubformState::createForSubform($form['plugin'], $form, $form_state);
     $this->plugin->submitConfigurationForm($form['plugin'], $subformState);
+    $form_state->setRedirect('oauth2_client.oauth2_client_plugin_list');
+    $this->messenger->addStatus(
+      $this->t('Configuration saved for <em>@label</em>', ['@label' => $this->plugin->getName()])
+    );
+  }
+
+  /**
+   * Additional submit function for saving both config and token.
+   *
+   * @param array $form
+   *   The current form build.
+   * @param \Drupal\Core\Form\FormStateInterface $formState
+   *   The current form state object.
+   */
+  public function testToken(array &$form, FormStateInterface $formState) {
+    $this->submitForm($form, $formState);
     // Try to obtain a token.
     try {
       // Clear the existing token.
       $this->clientService->clearAccessToken($this->plugin->getId());
-      $values = $form_state->getValues();
+      $values = $formState->getValues();
       $provider = $values['plugin']['credential_provider'];
       $credentials = $values['plugin'][$provider];
       $user = $credentials['username'] ?? NULL;
       $password = $credentials['password'] ?? NULL;
       $token = $this->clientService->getAccessToken($this->plugin->getId(), $user, $password);
       if ($token instanceof AccessTokenInterface) {
-        $form_state->setRedirect('oauth2_client.oauth2_client_plugin_list');
-        $this->messenger->addStatus(
-          $this->t('OAuth token obtained from remote website and stored.')
-        );
+        $formState->setRedirect('oauth2_client.oauth2_client_plugin_list');
       }
     }
-    catch (IdentityProviderException $e) {
+    catch (\Exception $e) {
+      $formState->disableRedirect();
       // Failed to get the access token.
-      // Reset original configuration.
       $this->messenger->addError(
         $this->t(
           'Unable to obtain an OAuth token. The error message is: @message',
           ['@message' => $e->getMessage()]
         )
       );
+      watchdog_exception('Oauth2 Client', $e);
     }
   }
 

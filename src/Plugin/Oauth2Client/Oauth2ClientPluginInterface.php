@@ -6,6 +6,7 @@ use Drupal\Component\Plugin\ConfigurableInterface;
 use Drupal\Component\Plugin\PluginInspectionInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Plugin\PluginFormInterface;
+use League\OAuth2\Client\Token\AccessToken;
 
 /**
  * Interface for Oauth2 Client plugins.
@@ -119,5 +120,34 @@ interface Oauth2ClientPluginInterface extends PluginInspectionInterface, Contain
    *   The data.
    */
   public function getStorageKey();
+
+  /**
+   * Stores access tokens obtained by this client.
+   *
+   * @param \League\OAuth2\Client\Token\AccessToken $accessToken
+   *   The token to store.
+   */
+  public function storeAccessToken(AccessToken $accessToken);
+
+  /**
+   * Retrieve the access token storage.
+   *
+   * @return mixed
+   *   The stored token, or NULL if no value exists.
+   */
+  public function retrieveAccessToken();
+
+  /**
+   * Clears the access token from storage.
+   */
+  public function clearAccessToken();
+
+  /**
+   * Check the plugin definition for success_message or return a static value.
+   *
+   * @return bool
+   *   Should a success message be displayed to the user?
+   */
+  public function displaySuccessMessage();
 
 }

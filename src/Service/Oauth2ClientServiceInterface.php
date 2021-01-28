@@ -19,12 +19,12 @@ interface Oauth2ClientServiceInterface {
   public function getClient($pluginId);
 
   /**
-   * Retrieve an access token from the Drupal state.
+   * Retrieve an access token from storage.
    *
    * @param string $pluginId
    *   The client for which a provider should be created.
    *
-   * @return \League\OAuth2\Client\Token\AccessTokenInterface
+   * @return \League\OAuth2\Client\Token\AccessTokenInterface|null
    *   The Access Token for the given client ID.
    */
   public function retrieveAccessToken($pluginId);

@@ -3,11 +3,19 @@
 namespace Drupal\oauth2_client\Service;
 
 use Drupal\oauth2_client\Exception\InvalidOauth2ClientException;
+use League\OAuth2\Client\Token\AccessTokenInterface;
 
 /**
  * Base class for OAuth2 Client services.
  */
 abstract class Oauth2ClientServiceBase implements Oauth2ClientServiceInterface {
+
+  /**
+   * The OAuth2 Client plugin manager.
+   *
+   * @var \Drupal\oauth2_client\PluginManager\Oauth2ClientPluginManagerInterface
+   */
+  protected $oauth2ClientPluginManager;
 
   /**
    * {@inheritdoc}
@@ -30,14 +38,20 @@ abstract class Oauth2ClientServiceBase implements Oauth2ClientServiceInterface {
    * {@inheritdoc}
    */
   public function retrieveAccessToken($pluginId) {
-    return $this->state->get('oauth2_client_access_token-' . $pluginId);
+    $client = $this->getClient($pluginId);
+    $token = $client->retrieveAccessToken();
+    if ($token instanceof AccessTokenInterface) {
+      return $token;
+    }
+    return NULL;
   }
 
   /**
    * {@inheritdoc}
    */
   public function clearAccessToken($pluginId) {
-    return $this->state->delete('oauth2_client_access_token-' . $pluginId);
+    $client = $this->getClient($pluginId);
+    $client->clearAccessToken();
   }
 
 }

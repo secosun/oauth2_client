@@ -13,3 +13,11 @@ oauth2_client.oauth2_client_plugin_list:
     _form: 'Drupal\oauth2_client\Form\Oauth2ClientPluginList'
   requirements:
     _permission: 'administer oauth2 clients'
+
+oauth2_client.code:
+  path: '/oauth2-client/{plugin}/code'
+  defaults:
+    _title: 'Capture Oauth2 Authorization Code'
+    _controller: '\Drupal\oauth2_client\Controller\OauthResponse::code'
+  requirements:
+    _oauth2_client_route_access: 'TRUE'

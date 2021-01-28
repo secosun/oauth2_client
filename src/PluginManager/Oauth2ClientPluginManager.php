@@ -11,8 +11,6 @@ use Drupal\Core\Plugin\DefaultPluginManager;
  */
 class Oauth2ClientPluginManager extends DefaultPluginManager implements Oauth2ClientPluginManagerInterface {
 
-  protected $settings;
-
   /**
    * Constructs an Oauth2ClientPluginManager object.
    *

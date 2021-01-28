@@ -54,3 +54,9 @@ services:
     arguments: ['@state']
     calls:
       - [ setKeyRepository, [ '@?key.repository' ] ]
+
+  oauth2_client.service.route_access:
+    class: Drupal\oauth2_client\Access\RouteAccess
+    arguments: ['@oauth2_client.plugin_manager']
+    tags:
+      - { name: access_check, applies_to: _oauth2_client_route_access }
