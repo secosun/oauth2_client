@@ -7,7 +7,7 @@
 /**
  * Get the class OAuth2\Client.
  */
-include_once drupal_get_path('module', 'oauth2_client') . '/oauth2_client.inc';
+include_once drupal_get_path('module', 'oauth2_client') . '/src/Client.php';
 
 /**
  * Gets all defined oauth2_clients.
