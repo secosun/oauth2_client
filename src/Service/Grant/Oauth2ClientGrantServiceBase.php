@@ -77,7 +77,7 @@ abstract class Oauth2ClientGrantServiceBase extends Oauth2ClientServiceBase impl
   /**
    * Creates a new provider object.
    *
-   * @param string $clientId
+   * @param string $pluginId
    *   The client for which a provider should be created.
    *
    * @return \League\OAuth2\Client\Provider\GenericProvider
@@ -86,12 +86,12 @@ abstract class Oauth2ClientGrantServiceBase extends Oauth2ClientServiceBase impl
    * @throws \Drupal\oauth2_client\Exception\InvalidOauth2ClientException
    *   Exception thrown when trying to retrieve a non-existent OAuth2 Client.
    */
-  protected function getProvider($clientId) {
-    if (isset($this->clientProviderCache[$clientId])) {
-      $provider = $this->clientProviderCache[$clientId];
+  protected function getProvider($pluginId) {
+    if (isset($this->clientProviderCache[$pluginId])) {
+      $provider = $this->clientProviderCache[$pluginId];
     }
     else {
-      $client = $this->getClient($clientId);
+      $client = $this->getClient($pluginId);
 
       $provider = new GenericProvider([
         'clientId' => $client->getClientId(),
@@ -103,7 +103,7 @@ abstract class Oauth2ClientGrantServiceBase extends Oauth2ClientServiceBase impl
         'scopes' => $client->getScopes(),
         'scopeSeparator' => $client->getScopeSeparator(),
       ]);
-      $this->clientProviderCache[$clientId] = $provider;
+      $this->clientProviderCache[$pluginId] = $provider;
     }
     return $provider;
   }
@@ -111,13 +111,13 @@ abstract class Oauth2ClientGrantServiceBase extends Oauth2ClientServiceBase impl
   /**
    * Store an access token using plugin specific storage.
    *
-   * @param string $clientId
+   * @param string $pluginId
    *   The client for which a provider should be created.
    * @param \League\OAuth2\Client\Token\AccessTokenInterface $accessToken
    *   The Access Token to be stored.
    */
-  protected function storeAccessToken($clientId, AccessTokenInterface $accessToken) {
-    $client = $this->oauth2ClientPluginManager->createInstance($clientId);
+  protected function storeAccessToken($pluginId, AccessTokenInterface $accessToken) {
+    $client = $this->oauth2ClientPluginManager->createInstance($pluginId);
     $client->storeAccessToken($accessToken);
   }
 

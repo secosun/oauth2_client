@@ -12,13 +12,13 @@ class ClientCredentialsGrantService extends Oauth2ClientGrantServiceBase {
   /**
    * {@inheritdoc}
    */
-  public function getAccessToken($clientId) {
-    $provider = $this->getProvider($clientId);
+  public function getAccessToken($pluginId) {
+    $provider = $this->getProvider($pluginId);
 
     try {
       $accessToken = $provider->getAccessToken('client_credentials');
 
-      $this->storeAccessToken($clientId, $accessToken);
+      $this->storeAccessToken($pluginId, $accessToken);
     }
     catch (IdentityProviderException $e) {
       // Failed to get the access token.
@@ -29,8 +29,8 @@ class ClientCredentialsGrantService extends Oauth2ClientGrantServiceBase {
   /**
    * {@inheritdoc}
    */
-  public function getGrantProvider($clientId) {
-    return $this->getProvider($clientId);
+  public function getGrantProvider($pluginId) {
+    return $this->getProvider($pluginId);
   }
 
 }

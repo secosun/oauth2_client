@@ -17,11 +17,11 @@ class ResourceOwnersCredentialsGrantService extends Oauth2ClientGrantServiceBase
   /**
    * {@inheritdoc}
    */
-  public function getAccessToken($clientId) {
-    $provider = $this->getProvider($clientId);
-    $credentials = $this->getUsernamePassword($clientId);
+  public function getAccessToken($pluginId) {
+    $provider = $this->getProvider($pluginId);
+    $credentials = $this->getUsernamePassword($pluginId);
     if (empty($credentials)) {
-      throw new \RuntimeException('Missing username and password for client plugin ' . $clientId);
+      throw new \RuntimeException('Missing username and password for client plugin ' . $pluginId);
     }
     try {
       $accessToken = $provider->getAccessToken('password', [
@@ -29,7 +29,7 @@ class ResourceOwnersCredentialsGrantService extends Oauth2ClientGrantServiceBase
         'password' => $credentials['password'],
       ]);
 
-      $this->storeAccessToken($clientId, $accessToken);
+      $this->storeAccessToken($pluginId, $accessToken);
     }
     catch (\Exception $e) {
       // Failed to get the access token.
@@ -40,8 +40,8 @@ class ResourceOwnersCredentialsGrantService extends Oauth2ClientGrantServiceBase
   /**
    * {@inheritdoc}
    */
-  public function getGrantProvider($clientId) {
-    return $this->getProvider($clientId);
+  public function getGrantProvider($pluginId) {
+    return $this->getProvider($pluginId);
   }
 
   /**

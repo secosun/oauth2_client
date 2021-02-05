@@ -113,7 +113,7 @@ class Oauth2ClientService extends Oauth2ClientServiceBase {
   /**
    * Obtains a Provider from the relevant service.
    *
-   * @param string $clientId
+   * @param string $pluginId
    *   The client for which a provider should be obtained.
    *
    * @return \League\OAuth2\Client\Provider\GenericProvider
@@ -122,9 +122,9 @@ class Oauth2ClientService extends Oauth2ClientServiceBase {
    * @throws \Drupal\oauth2_client\Exception\InvalidOauth2ClientException
    *   Thrown in the upstream League library.
    */
-  public function getProvider($clientId) {
-    $client = $this->getClient($clientId);
-    return $this->grantServices[$client->getGrantType()]->getGrantProvider($clientId);
+  public function getProvider($pluginId) {
+    $client = $this->getClient($pluginId);
+    return $this->grantServices[$client->getGrantType()]->getGrantProvider($pluginId);
   }
 
 }

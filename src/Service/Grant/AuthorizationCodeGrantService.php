@@ -54,13 +54,13 @@ class AuthorizationCodeGrantService extends Oauth2ClientGrantServiceBase {
   /**
    * {@inheritdoc}
    */
-  public function getAccessToken($clientId) {
-    $provider = $this->getProvider($clientId);
+  public function getAccessToken($pluginId) {
+    $provider = $this->getProvider($pluginId);
     // Get the authorization URL. This also generates the state.
     $authorization_url = $provider->getAuthorizationUrl();
 
     // Save the state to Drupal's tempstore.
-    $this->tempstore->set('oauth2_client_state-' . $clientId, $provider->getState());
+    $this->tempstore->set('oauth2_client_state-' . $pluginId, $provider->getState());
     if ($this->currentRequest->hasSession()) {
       // If we have a session, save before redirect.
       $this->currentRequest->getSession()->save();
@@ -74,7 +74,7 @@ class AuthorizationCodeGrantService extends Oauth2ClientGrantServiceBase {
   /**
    * Executes an authorization_code grant request with the give code.
    *
-   * @param string $clientId
+   * @param string $pluginId
    *   The client plugin id.
    * @param string $code
    *   The authorization code.
@@ -85,15 +85,15 @@ class AuthorizationCodeGrantService extends Oauth2ClientGrantServiceBase {
    * @throws \Drupal\oauth2_client\Exception\InvalidOauth2ClientException
    *   Exception thrown when trying to retrieve a non-existent OAuth2 Client.
    */
-  public function requestAccessToken($clientId, $code) {
-    $provider = $this->getProvider($clientId);
+  public function requestAccessToken($pluginId, $code) {
+    $provider = $this->getProvider($pluginId);
     // Try to get an access token using the authorization code grant.
     try {
       $accessToken = $provider->getAccessToken('authorization_code', [
         'code' => $code,
       ]);
       if ($accessToken instanceof AccessTokenInterface) {
-        $this->storeAccessToken($clientId, $accessToken);
+        $this->storeAccessToken($pluginId, $accessToken);
         return TRUE;
       }
     }
@@ -106,21 +106,21 @@ class AuthorizationCodeGrantService extends Oauth2ClientGrantServiceBase {
   /**
    * {@inheritdoc}
    */
-  public function getGrantProvider($clientId) {
-    return $this->getProvider($clientId);
+  public function getGrantProvider($pluginId) {
+    return $this->getProvider($pluginId);
   }
 
   /**
    * Provide a redirect for use following authorization code capture.
    *
-   * @param string $clientId
+   * @param string $pluginId
    *   The client plugin id.
    *
    * @return \Symfony\Component\HttpFoundation\RedirectResponse
    *   The redirect response.
    */
-  public function getPostCaptureRedirect($clientId) {
-    $clientPlugin = $this->getClient($clientId);
+  public function getPostCaptureRedirect($pluginId) {
+    $clientPlugin = $this->getClient($pluginId);
     if ($clientPlugin instanceof Oauth2ClientPluginRedirectInterface) {
       return $clientPlugin->getPostCaptureRedirect();
     }

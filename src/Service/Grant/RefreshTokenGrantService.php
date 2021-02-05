@@ -12,17 +12,17 @@ class RefreshTokenGrantService extends Oauth2ClientGrantServiceBase {
   /**
    * {@inheritdoc}
    */
-  public function getAccessToken($clientId) {
-    $accessToken = $this->retrieveAccessToken($clientId);
+  public function getAccessToken($pluginId) {
+    $accessToken = $this->retrieveAccessToken($pluginId);
     if ($accessToken instanceof AccessTokenInterface) {
       $expirationTimestamp = $accessToken->getExpires();
       if (!empty($expirationTimestamp) && $accessToken->hasExpired()) {
-        $provider = $this->getProvider($clientId);
+        $provider = $this->getProvider($pluginId);
         $newAccessToken = $provider->getAccessToken('refresh_token', [
           'refresh_token' => $accessToken->getRefreshToken(),
         ]);
 
-        $this->storeAccessToken($clientId, $newAccessToken);
+        $this->storeAccessToken($pluginId, $newAccessToken);
       }
     }
   }
@@ -30,8 +30,8 @@ class RefreshTokenGrantService extends Oauth2ClientGrantServiceBase {
   /**
    * {@inheritdoc}
    */
-  public function getGrantProvider($clientId) {
-    return $this->getProvider($clientId);
+  public function getGrantProvider($pluginId) {
+    return $this->getProvider($pluginId);
   }
 
 }
